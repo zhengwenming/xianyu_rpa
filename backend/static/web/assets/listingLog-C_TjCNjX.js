@@ -1,0 +1,1 @@
+import{m as s}from"./index-BxbIcK5e.js";const e="/api/listing-logs";function i(t){return s.get(e,{params:t})}function o(t){return s.get(`${e}/summary`,{params:t})}function r(t){return s.delete(e,{params:t})}function g(t){return s.get(`${e}/export`,{params:t,responseType:"blob"})}export{r as c,g as e,o as g,i as l};

@@ -1,0 +1,26 @@
+{
+  "name": "xianyu-auto-frontend",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "vue": "^3.4.27",
+    "vue-router": "^4.3.2",
+    "pinia": "^2.1.7",
+    "axios": "^1.7.2",
+    "element-plus": "^2.7.5",
+    "echarts": "^5.5.0",
+    "vue-echarts": "^6.7.2",
+    "vue-virtual-scroller": "^2.0.0-beta.8",
+    "@element-plus/icons-vue": "^2.3.1"
+  },
+  "devDependencies": {
+    "vite": "^5.2.12",
+    "@vitejs/plugin-vue": "^5.0.5"
+  }
+}
