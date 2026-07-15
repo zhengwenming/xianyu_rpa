@@ -25,4 +25,7 @@ backend/.env
 
 # OS
 .DS_Store
-Thumbs.dbbuild/
+Thumbs.db
+
+# Build
+build/

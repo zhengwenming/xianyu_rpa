@@ -18,6 +18,10 @@
         <span class="label">创建时间</span>
         <span class="value">{{ formatTime(task.created_at) }}</span>
       </div>
+      <div v-if="task.status === 'failed' && task.error_message" class="error-box">
+        <el-icon class="error-icon"><WarningFilled /></el-icon>
+        <span class="error-text">{{ task.error_message }}</span>
+      </div>
     </div>
     <div class="card-actions">
       <slot name="actions" :task="task" />
@@ -27,6 +31,7 @@
 
 <script setup>
 import { computed } from 'vue'
+import { WarningFilled } from '@element-plus/icons-vue'
 
 const props = defineProps({
   task: { type: Object, required: true },
@@ -77,5 +82,17 @@ function formatTime(ts) {
 .info-row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px; }
 .info-row .label { color: var(--text-secondary); }
 .info-row .value { color: var(--text-primary); }
+.error-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: 10px;
+  padding: 8px 10px;
+  background: rgba(245, 108, 108, 0.1);
+  border: 1px solid rgba(245, 108, 108, 0.3);
+  border-radius: 6px;
+}
+.error-icon { color: #f56c6c; margin-top: 1px; flex-shrink: 0; }
+.error-text { font-size: 12px; color: #f56c6c; line-height: 1.5; word-break: break-all; }
 .card-actions { display: flex; gap: 6px; flex-wrap: wrap; }
 </style>

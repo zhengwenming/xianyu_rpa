@@ -2,7 +2,12 @@
   <div class="page-container">
     <div class="page-header">
       <h1 class="page-title">任务管理</h1>
-      <el-button type="primary" @click="showCreateDialog = true">创建任务</el-button>
+      <div>
+        <el-tag v-if="collectorLogin === true" type="success" style="margin-right:8px">1688采集账号已登录</el-tag>
+        <el-tag v-else-if="collectorLogin === false" type="danger" style="margin-right:8px">1688采集账号未登录</el-tag>
+        <el-button :loading="collectorLoggingIn" @click="handleCollectorLogin" style="margin-right:8px">登录1688采集账号</el-button>
+        <el-button type="primary" @click="showCreateDialog = true">创建任务</el-button>
+      </div>
     </div>
     <div class="filter-bar">
       <el-select v-model="filterStatus" placeholder="状态筛选" clearable style="width:140px">
@@ -33,6 +38,7 @@
             <el-button size="small" @click="handleCancel(task.id)">取消</el-button>
           </template>
           <template v-else>
+            <el-button size="small" type="primary" @click="handleRestart(task.id)">重新开始</el-button>
             <el-button size="small" @click="handleDelete(task.id)">删除</el-button>
           </template>
         </template>
@@ -68,6 +74,22 @@ import TaskCard from '../components/TaskCard.vue'
 
 const tasks = ref([]), shops = ref([]), filterStatus = ref(''), showCreateDialog = ref(false)
 const createForm = ref({ name: '', shop_id: '', keywords: '', target_count: 10, category: '' })
+const collectorLogin = ref(null), collectorLoggingIn = ref(false)
+
+async function loadCollectorStatus() {
+  try { const res = await taskApi.getCollectorLoginStatus(); collectorLogin.value = !!res.data.data?.is_login }
+  catch (e) { console.error(e); collectorLogin.value = null }
+}
+async function handleCollectorLogin() {
+  collectorLoggingIn.value = true
+  ElMessage.info('已打开浏览器窗口，请扫码登录 1688（最多等待 4 分钟，期间请勿关闭窗口）')
+  try {
+    const res = await taskApi.collectorLogin()
+    if (res.data.code === 0) { ElMessage.success('1688 采集账号登录成功'); collectorLogin.value = true }
+    else { ElMessage.error(res.data.message || '登录失败'); collectorLogin.value = false }
+  } catch (e) { ElMessage.error('登录请求异常：' + (e.message || e)) }
+  finally { collectorLoggingIn.value = false }
+}
 
 async function loadTasks() {
   try { const params = { page: 1, page_size: 50 }; if (filterStatus.value) params.status = filterStatus.value
@@ -75,6 +97,7 @@ async function loadTasks() {
 }
 async function loadShops() { try { const res = await shopApi.listShops(); shops.value = res.data.data || [] } catch (e) { console.error(e) } }
 async function handleStart(id) { const res = await taskApi.startTask(id); res.data.code === 0 ? ElMessage.success('任务已启动') : ElMessage.error(res.data.message); await loadTasks() }
+async function handleRestart(id) { const res = await taskApi.restartTask(id); res.data.code === 0 ? ElMessage.success('任务已重新启动') : ElMessage.error(res.data.message); await loadTasks() }
 async function handlePause(id) { await taskApi.pauseTask(id); ElMessage.success('任务已暂停'); await loadTasks() }
 async function handleResume(id) { await taskApi.resumeTask(id); ElMessage.success('任务已恢复'); await loadTasks() }
 async function handleCancel(id) { await taskApi.cancelTask(id); ElMessage.success('任务已取消'); await loadTasks() }
@@ -86,7 +109,7 @@ async function submitCreate() {
     target_count: createForm.value.target_count, category: createForm.value.category }
   await taskApi.createTask(data); showCreateDialog.value = false; ElMessage.success('任务创建成功'); await loadTasks()
 }
-onMounted(() => { loadTasks(); loadShops() })
+onMounted(() => { loadTasks(); loadShops(); loadCollectorStatus() })
 </script>
 
 <style scoped>

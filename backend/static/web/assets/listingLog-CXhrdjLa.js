@@ -1,0 +1,1 @@
+import{n}from"./index-ARQDUoC4.js";const s="/api/listing-logs";function i(t){return n.get(s,{params:t})}function o(t){return n.get(`${s}/summary`,{params:t})}function r(t){return n.delete(s,{params:t})}function g(t){return n.get(`${s}/export`,{params:t,responseType:"blob"})}export{r as c,g as e,o as g,i as l};

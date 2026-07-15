@@ -1,0 +1,14 @@
+[project]
+name = "xianyu-rpa"
+version = "1.0.0"
+description = "闲鱼自动化铺货系统（桌面版）：自动上架 + 大模型自动回复 + 自动发货 + 自动下架"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+
+# 真实依赖清单维护在 backend/requirements.txt，
+# 使用 `pip install -r requirements.txt` 安装。
+dynamic = ["dependencies"]
+
+[tool.setuptools.dynamic]
+dependencies = { file = ["backend/requirements.txt"] }

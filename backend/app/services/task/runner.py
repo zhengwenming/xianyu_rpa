@@ -52,7 +52,11 @@ class TaskRunner:
                 collected_products = await self._collect_products(task, settings)
                 if not collected_products:
                     logger.warning(f"任务 {self.task_id} 未采集到商品")
-                    await task_manager.on_task_completed(self.task_id, TaskStatus.FAILED.value)
+                    await task_manager.on_task_completed(
+                        self.task_id,
+                        TaskStatus.FAILED.value,
+                        error_message="未采集到任何商品，请检查关键词/采集来源、店铺登录状态或网络连接",
+                    )
                     return
 
                 # 上架循环
@@ -119,12 +123,24 @@ class TaskRunner:
                 # 标记完成
                 if task.current_count >= task.target_count:
                     await task_manager.on_task_completed(self.task_id, TaskStatus.COMPLETED.value)
+                elif task.current_count == 0:
+                    # 一个都没上架成功，视为失败并给出原因
+                    await task_manager.on_task_completed(
+                        self.task_id,
+                        TaskStatus.FAILED.value,
+                        error_message=f"全部 {task.fail_count} 个商品上架均失败，请查看上架日志排查具体原因",
+                    )
                 else:
+                    # 部分完成，仍标记为已完成
                     await task_manager.on_task_completed(self.task_id, TaskStatus.COMPLETED.value)
 
         except Exception as e:
             logger.error(f"任务执行异常: {e}", extra={"task_id": self.task_id})
-            await task_manager.on_task_completed(self.task_id, TaskStatus.FAILED.value)
+            await task_manager.on_task_completed(
+                self.task_id,
+                TaskStatus.FAILED.value,
+                error_message=f"任务执行异常: {e}",
+            )
 
     async def _collect_products(self, task: Task, settings: GlobalSettings) -> list[dict]:
         """采集商品"""

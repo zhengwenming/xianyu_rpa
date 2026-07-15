@@ -1,0 +1,3 @@
+# 根目录依赖入口 —— 真实清单在 backend/requirements.txt
+# 开发者在项目根目录执行 `pip install -r requirements.txt` 即可安装全部后端依赖
+-r backend/requirements.txt

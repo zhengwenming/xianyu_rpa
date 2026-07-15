@@ -88,8 +88,21 @@ class TaskManager:
                 logger.error(f"任务 {task_id} 不能从 {task.status} 转换为 running")
                 return False
 
+            # 若是从终态（失败/取消/完成）重新启动，重置进度与错误信息
+            if task.status in (
+                TaskStatus.FAILED.value,
+                TaskStatus.CANCELLED.value,
+                TaskStatus.COMPLETED.value,
+            ):
+                task.current_count = 0
+                task.fail_count = 0
+                task.progress = 0
+                task.end_time = None
+                logger.info(f"任务 {task_id} 从 {task.status} 状态重新启动")
+
             task.status = TaskStatus.RUNNING.value
             task.start_time = datetime.now()
+            task.error_message = None
             await session.commit()
 
         # 创建暂停事件和取消标志
@@ -105,6 +118,14 @@ class TaskManager:
 
         logger.info(f"任务已启动: {task_id}")
         return True
+
+    async def restart_task(self, task_id: str) -> bool:
+        """重新启动任务（终态任务重跑）"""
+        # 清理可能残留的运行态标志
+        self._runners.pop(task_id, None)
+        self._pause_events.pop(task_id, None)
+        self._cancel_flags.pop(task_id, None)
+        return await self.start_task(task_id)
 
     async def pause_task(self, task_id: str) -> bool:
         """暂停任务"""
@@ -192,7 +213,7 @@ class TaskManager:
             self._pause_events[task_id].set()
         return self._pause_events[task_id]
 
-    async def on_task_completed(self, task_id: str, status: str = TaskStatus.COMPLETED.value):
+    async def on_task_completed(self, task_id: str, status: str = TaskStatus.COMPLETED.value, error_message: str = None):
         """任务完成回调"""
         self._runners.pop(task_id, None)
         self._pause_events.pop(task_id, None)
@@ -203,6 +224,8 @@ class TaskManager:
                 task.status = status
                 task.end_time = datetime.now()
                 task.progress = 100 if status == TaskStatus.COMPLETED.value else task.progress
+                if error_message:
+                    task.error_message = error_message
                 await session.commit()
 
             # 更新策略日志

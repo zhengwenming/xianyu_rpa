@@ -1,0 +1,1 @@
+import{n as o}from"./index-ARQDUoC4.js";const e="/api/shops";function u(){return o.get(e)}function s(t){return o.post(e,t)}function p(t,r){return o.put(`${e}/${t}`,r)}function a(t){return o.delete(`${e}/${t}`)}function i(t){return o.post(`${e}/${t}/authorize`)}function c(t){return o.post(`${e}/${t}/revoke`)}export{i as a,s as c,a as d,u as l,c as r,p as u};

@@ -22,6 +22,6 @@ if [ ! -f "backend/static/web/index.html" ]; then
     cd "$PROJECT_DIR"
 fi
 
-# 启动桌面 App（app.py 会自动激活 venv）
+# 启动桌面 App（launcher.py 会自动激活 venv）
 echo ">>> 启动桌面 App..."
-python3 app.py
+python3 launcher.py

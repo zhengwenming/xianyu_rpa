@@ -52,8 +52,10 @@
 
 **或直接：**
 ```bash
-python3 app.py
+python3 launcher.py
 ```
+
+> 提示：如需单独安装 Python 依赖，可在项目根目录执行 `pip install -r requirements.txt`。
 
 启动后自动弹出桌面窗口，无需浏览器。
 
@@ -79,8 +81,11 @@ scripts\build_win.bat
 
 ```
 xianyu_rpa/
-├── app.py                     # 桌面 App 启动入口（关键文件）
+├── launcher.py                # 桌面 App 启动入口（关键文件）
 ├── build.spec                 # PyInstaller 打包配置
+├── requirements.txt           # 根级依赖入口（转引用 backend/requirements.txt）
+├── pyproject.toml             # Python 项目元数据
+├── docs/                      # 文档与开发资料
 ├── frontend/                  # Vue3 前端源码
 │   └── src/
 ├── backend/                   # Python 后端
@@ -88,7 +93,7 @@ xianyu_rpa/
 │   ├── static/
 │   │   ├── web/               # 前端构建产物（npm run build 生成）
 │   │   └── goofish_js/        # 闲鱼签名 JS
-│   └── requirements.txt
+│   └── requirements.txt       # 后端真实依赖清单
 ├── scripts/
 │   ├── setup.sh / .bat        # 一键安装
 │   ├── start.sh / .bat        # 一键启动

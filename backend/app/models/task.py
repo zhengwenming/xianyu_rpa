@@ -31,9 +31,9 @@ class Task(Base):
         "pending": ["running", "cancelled"],
         "running": ["paused", "cancelled", "completed", "failed"],
         "paused": ["running", "cancelled"],
-        "cancelled": [],
-        "completed": [],
-        "failed": [],
+        "cancelled": ["running"],
+        "completed": ["running"],
+        "failed": ["running"],
     }
 
     def can_transition_to(self, target_status: str) -> bool:

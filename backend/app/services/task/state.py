@@ -16,9 +16,10 @@ VALID_TRANSITIONS = {
     TaskStatus.PENDING: [TaskStatus.RUNNING, TaskStatus.CANCELLED],
     TaskStatus.RUNNING: [TaskStatus.PAUSED, TaskStatus.CANCELLED, TaskStatus.COMPLETED, TaskStatus.FAILED],
     TaskStatus.PAUSED: [TaskStatus.RUNNING, TaskStatus.CANCELLED],
-    TaskStatus.CANCELLED: [],
-    TaskStatus.COMPLETED: [],
-    TaskStatus.FAILED: [],
+    # 终态允许重新启动（重跑）
+    TaskStatus.CANCELLED: [TaskStatus.RUNNING],
+    TaskStatus.COMPLETED: [TaskStatus.RUNNING],
+    TaskStatus.FAILED: [TaskStatus.RUNNING],
 }
 
 

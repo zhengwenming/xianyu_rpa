@@ -40,10 +40,12 @@ if not exist "venv" (
 call venv\Scripts\activate.bat
 
 REM ─── 4. 安装后端依赖 ───
+REM 使用清华镜像加速；--only-binary 强制 cryptography/cffi 用预编译 wheel，避免现场 Rust 编译
+set "PIP_MIRROR=https://pypi.tuna.tsinghua.edu.cn/simple"
 echo.
 echo ^>^>^> 安装后端依赖（含 pywebview + pyinstaller）...
-python -m pip install --upgrade pip -q
-pip install -r requirements.txt
+python -m pip install --upgrade pip -q -i "%PIP_MIRROR%"
+pip install -r "%PROJECT_DIR%\requirements.txt" -i "%PIP_MIRROR%" --only-binary=cryptography,cffi --timeout 120
 
 REM ─── 5. 安装 Playwright 浏览器 ───
 echo.

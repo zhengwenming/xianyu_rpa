@@ -20,8 +20,8 @@ if not exist "backend\static\web\index.html" (
     cd /d "%PROJECT_DIR%"
 )
 
-REM 启动桌面 App（app.py 会自动激活 venv）
+REM 启动桌面 App（launcher.py 会自动激活 venv）
 echo ^>^>^> 启动桌面 App...
-python app.py
+python launcher.py
 
 pause

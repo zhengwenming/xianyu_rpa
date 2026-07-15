@@ -30,7 +30,11 @@ class XianyuWebSocketClient:
         """建立 WebSocket 连接"""
         try:
             sign = await sign_engine.sign(
-                {"ts": str(int(time.time() * 1000))},
+                {
+                    "t": str(int(time.time() * 1000)),
+                    "appKey": "34839810",
+                    "data": "{}",
+                },
                 self.cookie,
             )
             headers = {

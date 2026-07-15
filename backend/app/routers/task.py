@@ -7,6 +7,7 @@ from pydantic import BaseModel
 from app.database import get_db
 from app.models.task import Task
 from app.services.task.manager import task_manager
+from app.services.browser.alibaba import alibaba_collector
 
 router = APIRouter(prefix="/api/tasks", tags=["任务管理"])
 
@@ -48,6 +49,22 @@ async def create_task(data: TaskCreate):
     return {"code": 0, "data": task.to_dict(), "message": "任务创建成功"}
 
 
+@router.get("/collector/login-status")
+async def collector_login_status():
+    """查询 1688 采集账号登录态"""
+    is_login = await alibaba_collector.check_login()
+    return {"code": 0, "data": {"is_login": is_login}, "message": "ok"}
+
+
+@router.post("/collector/login")
+async def collector_login():
+    """打开有头浏览器扫码登录 1688 采集账号（阻塞直到登录成功或超时）"""
+    ok = await alibaba_collector.login(timeout_sec=240)
+    if ok:
+        return {"code": 0, "data": {"is_login": True}, "message": "1688 采集账号登录成功"}
+    return {"code": 1, "data": {"is_login": False}, "message": "登录超时或失败，请重试（窗口保持打开期间可继续扫码）"}
+
+
 @router.get("/{task_id}")
 async def get_task(task_id: str, db: AsyncSession = Depends(get_db)):
     task = await db.get(Task, task_id)
@@ -60,6 +77,12 @@ async def get_task(task_id: str, db: AsyncSession = Depends(get_db)):
 async def start_task(task_id: str):
     success = await task_manager.start_task(task_id)
     return {"code": 0 if success else 1, "data": None, "message": "任务已启动" if success else "启动失败"}
+
+
+@router.post("/{task_id}/restart")
+async def restart_task(task_id: str):
+    success = await task_manager.restart_task(task_id)
+    return {"code": 0 if success else 1, "data": None, "message": "任务已重新启动" if success else "重启失败"}
 
 
 @router.post("/{task_id}/pause")
